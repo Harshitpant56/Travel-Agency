@@ -1,19 +1,46 @@
 // import React from 'react'
- import { calculateTrendPercentage } from '~/lib/utils'
+import { cn } from "~/lib/utils";
+import { calculateTrendPercentage } from "~/lib/utils";
 
 const StatsCard = ({
-    headerTitle,
-    total,
-    lastMonthCount,
-    currentMonthCount }: StatsCard) => {
-    const { trend, percentage } = calculateTrendPercentage(currentMonthCount, lastMonthCount);
+  headerTitle,
+  total,
+  lastMonthCount,
+  currentMonthCount,
+}: StatsCard) => {
+  const { trend, percentage } = calculateTrendPercentage(
+    currentMonthCount,
+    lastMonthCount
+  );
 
-    const isDecrement = trend === 'decrement';
+  const isDecrement = trend === "decrement";
   return (
-    <article>
-        <h3>{headerTitle}</h3>
-    </article>
-  )
-}
+    <article className="stats-card">
+      <h3 className="text-basr font-medium">{headerTitle}</h3>
 
-export default StatsCard
+      <div className="content">
+        <div className="flex flex-col gap-4">
+          <h2 className="text-4xl font-semibold">{total}</h2>
+          <div className="flex items-centre gap-2">
+            <figure className="flex items-centre gap-2">
+              <img
+                src={`/assets/icons/${
+                  isDecrement ? "arrow-down-red.svg" : "arrow-up-green.svg"
+                }`}
+                className="size-5"
+                alt="arrow"
+              />
+              <figcaption className={cn('text-sm font-medium', isDecrement ? 'text-red-500' : 'text-success-700')}>
+                {Math.round(percentage)}%
+              </figcaption>
+            </figure>
+            <p className="text-sm font-medium text-gray-100 truncate">vs last month</p>
+          </div>
+        </div>
+         <img src={`/assets/icons/${isDecrement ? 'decrement.svg' : 'increment.svg'} `} className="xl:w-32 w-full h-full md:h-32 xl:h-full" alt="trend graph" />
+      </div>
+    </article>
+  );
+};
+
+export default StatsCard;

@@ -2,7 +2,7 @@ import { ID, OAuthProvider, Query } from "appwrite";
 import { account, database, appwriteConfig } from "~/appwrite/client";
 import { redirect } from "react-router";
 
-export const getExistingUser = async (id) => {
+export const getExistingUser = async (id: string) => {
     try {
         const { documents, total } = await database.listDocuments(
             appwriteConfig.databaseId,
@@ -17,6 +17,8 @@ export const getExistingUser = async (id) => {
 };
 
 export const storeUserData = async () => {
+    console.log("🧠 storeUserData called");
+
     try {
         const user = await account.get();
         if (!user) throw new Error("User not found");
@@ -26,18 +28,20 @@ export const storeUserData = async () => {
             ? await getGooglePicture(providerAccessToken)
             : null;
 
-        const createdUser = await database.createDocument(
-            appwriteConfig.databaseId,
-            appwriteConfig.userCollectionId,
-            ID.unique(),
-            {
-                accountId: user.$id,
-                email: user.email,
-                name: user.name,
-                imageUrl: profilePicture,
-                joinedAt: new Date().toISOString(),
-            }
-        );
+            const createdUser = await database.createDocument(
+                appwriteConfig.databaseId,
+                appwriteConfig.userCollectionId,
+                ID.unique(),
+                {
+                    accountId: user.$id,
+                    email: user.email,
+                    name: user.name,
+                    imageUrl: profilePicture,
+                    joinedAt: new Date().toISOString(),
+                    status: "user", // ✅ REQUIRED FIX
+                }
+            );
+            
 
         if (!createdUser.$id) redirect("/sign-in");
     } catch (error) {
@@ -45,7 +49,7 @@ export const storeUserData = async () => {
     }
 };
 
-const getGooglePicture = async (accessToken) => {
+const getGooglePicture = async (accessToken: string) => {
     try {
         const response = await fetch(
             "https://people.googleapis.com/v1/people/me?personFields=photos",
@@ -102,7 +106,7 @@ export const getUser = async () => {
     }
 };
 
-export const getAllUsers = async (limit, offset) => {
+export const getAllUsers = async (limit: number, offset: number) => {
     try {
         const { documents: users, total } = await database.listDocuments(
             appwriteConfig.databaseId,
